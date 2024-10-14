@@ -3,9 +3,6 @@ const axios = require('axios');
 
 const app = express();
 
-// Middleware to parse JSON bodies
-app.use(express.json());
-
 // Create an API endpoint to receive the 'msg' parameter from the URL
 app.get('/chat', async (req, res) => {
     // Get the 'msg' parameter from the URL
@@ -55,23 +52,19 @@ app.get('/chat', async (req, res) => {
             }
         });
 
-        // Decode the response (if needed) and ensure it is valid JSON
-        let apiResponse;
-        try {
-            apiResponse = JSON.parse(response.data);
-        } catch (error) {
-            console.error("Error parsing API response:", error.message);
-            return res.json({
+        // Ensure response data is in proper JSON format
+        const apiResponse = response.data;
+        if (apiResponse) {
+            res.json({
+                success: true,
+                response: apiResponse
+            });
+        } else {
+            res.json({
                 success: false,
-                response: "Failed to parse response from the API."
+                response: "No data received from the API."
             });
         }
-
-        // Return the successful response
-        res.json({
-            success: true,
-            response: apiResponse
-        });
 
     } catch (error) {
         // Output error in case of a failure
